@@ -1,5 +1,5 @@
 // Controle de Gastos
-// Nesta versão: além de remover, dá para editar um gasto pelo mesmo formulário.
+// Nesta versão: dá para filtrar a lista por categoria e por mês.
 
 var CHAVE_STORAGE = 'gastos-controle';
 
@@ -9,13 +9,16 @@ var form = document.getElementById('form-gasto');
 var listaGastos = document.getElementById('lista-gastos');
 var listaVazia = document.getElementById('lista-vazia');
 
-// Campos guardados em variáveis para facilitar na edição
 var campoDescricao = document.getElementById('descricao');
 var campoValor = document.getElementById('valor');
 var campoData = document.getElementById('data');
 var campoCategoria = document.getElementById('categoria');
 var botaoForm = document.getElementById('botao-form');
 var botaoCancelar = document.getElementById('botao-cancelar');
+
+var filtroCategoria = document.getElementById('filtro-categoria');
+var filtroMes = document.getElementById('filtro-mes');
+var botaoLimparFiltros = document.getElementById('botao-limpar-filtros');
 
 // Guarda o id do gasto que está sendo editado (null = é um gasto novo)
 var idEditando = null;
@@ -27,6 +30,11 @@ var nomesCategorias = {
   saude: 'Saúde',
   outros: 'Outros'
 };
+
+var nomesMeses = [
+  'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+  'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'
+];
 
 form.addEventListener('submit', function (evento) {
   evento.preventDefault();
@@ -107,6 +115,48 @@ function cancelarEdicao() {
 
 botaoCancelar.addEventListener('click', cancelarEdicao);
 
+filtroCategoria.addEventListener('change', renderizarLista);
+filtroMes.addEventListener('change', renderizarLista);
+botaoLimparFiltros.addEventListener('click', function () {
+  filtroCategoria.value = '';
+  filtroMes.value = '';
+  renderizarLista();
+});
+
+// Monta a lista de meses disponíveis a partir das datas dos gastos
+function preencherMeses() {
+  var meses = {};
+  gastos.forEach(function (g) {
+    meses[g.data.substring(0, 7)] = true; // guarda o "2026-11" da data
+  });
+
+  var escolhido = filtroMes.value;
+
+  filtroMes.innerHTML = '<option value="">Todos</option>';
+  Object.keys(meses).sort().reverse().forEach(function (mes) {
+    var opcao = document.createElement('option');
+    opcao.value = mes;
+    opcao.textContent = nomeDoMes(mes);
+    filtroMes.appendChild(opcao);
+  });
+
+  filtroMes.value = escolhido;
+}
+
+function nomeDoMes(mes) {
+  var numero = parseInt(mes.substring(5, 7), 10);
+  return nomesMeses[numero - 1] + '/' + mes.substring(0, 4);
+}
+
+// Devolve só os gastos que passam pelos filtros escolhidos
+function gastosFiltrados() {
+  return gastos.filter(function (g) {
+    var passaCategoria = filtroCategoria.value === '' || g.categoria === filtroCategoria.value;
+    var passaMes = filtroMes.value === '' || g.data.substring(0, 7) === filtroMes.value;
+    return passaCategoria && passaMes;
+  });
+}
+
 // Salva a lista no navegador
 function salvarGastos() {
   localStorage.setItem(CHAVE_STORAGE, JSON.stringify(gastos));
@@ -136,10 +186,14 @@ function removerGasto(id) {
 }
 
 function renderizarLista() {
+  preencherMeses();
+
+  var filtrados = gastosFiltrados();
+
   listaGastos.innerHTML = '';
 
   // Ordena do gasto mais recente para o mais antigo
-  var ordenados = gastos.slice().sort(function (a, b) {
+  var ordenados = filtrados.slice().sort(function (a, b) {
     return b.data.localeCompare(a.data) || b.id - a.id;
   });
 
@@ -188,7 +242,15 @@ function renderizarLista() {
     listaGastos.appendChild(item);
   });
 
-  listaVazia.style.display = gastos.length === 0 ? 'block' : 'none';
+  if (gastos.length === 0) {
+    listaVazia.textContent = 'Nenhum gasto registrado ainda.';
+    listaVazia.style.display = 'block';
+  } else if (filtrados.length === 0) {
+    listaVazia.textContent = 'Nenhum gasto encontrado com esses filtros.';
+    listaVazia.style.display = 'block';
+  } else {
+    listaVazia.style.display = 'none';
+  }
 }
 
 function formatarValor(valor) {
