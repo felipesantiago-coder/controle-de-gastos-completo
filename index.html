@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Gastos</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Controle de Gastos</h1>
+    <p>Um lugar simples para acompanhar seus gastos</p>
+  </header>
+
+  <main>
+    <section class="formulario">
+      <h2>Novo gasto</h2>
+      <form id="form-gasto">
+        <label for="descricao">Descrição</label>
+        <input type="text" id="descricao" name="descricao" placeholder="Ex.: mercado" required>
+
+        <label for="valor">Valor (R$)</label>
+        <input type="number" id="valor" name="valor" step="0.01" min="0.01" required>
+
+        <label for="data">Data</label>
+        <input type="date" id="data" name="data" required>
+
+        <label for="categoria">Categoria</label>
+        <select id="categoria" name="categoria" required>
+          <option value="alimentacao">Alimentação</option>
+          <option value="transporte">Transporte</option>
+          <option value="lazer">Lazer</option>
+          <option value="saude">Saúde</option>
+          <option value="outros">Outros</option>
+        </select>
+
+        <button type="submit" id="botao-form">Adicionar gasto</button>
+        <button type="button" id="botao-cancelar" class="oculto">Cancelar edição</button>
+      </form>
+    </section>
+
+    <section class="filtros">
+      <h2>Filtros</h2>
+      <label for="filtro-categoria">Categoria</label>
+      <select id="filtro-categoria">
+        <option value="">Todas</option>
+        <option value="alimentacao">Alimentação</option>
+        <option value="transporte">Transporte</option>
+        <option value="lazer">Lazer</option>
+        <option value="saude">Saúde</option>
+        <option value="outros">Outros</option>
+      </select>
+
+      <label for="filtro-mes">Mês</label>
+      <select id="filtro-mes">
+        <option value="">Todos</option>
+      </select>
+
+      <button type="button" id="botao-limpar-filtros" class="secundario">Limpar filtros</button>
+    </section>
+
+    <section class="resumo">
+      <h2>Resumo</h2>
+      <div class="cards">
+        <div class="card">
+          <span class="card-titulo">Total filtrado</span>
+          <span class="card-valor" id="total-filtrado">R$ 0,00</span>
+        </div>
+        <div class="card">
+          <span class="card-titulo">Total geral</span>
+          <span class="card-valor" id="total-geral">R$ 0,00</span>
+        </div>
+        <div class="card">
+          <span class="card-titulo">Maior categoria</span>
+          <span class="card-valor" id="maior-categoria">—</span>
+        </div>
+      </div>
+      <canvas id="grafico-categorias" width="300" height="300"></canvas>
+    </section>
+
+    <section class="lista">
+      <h2>Gastos registrados</h2>
+      <ul id="lista-gastos"></ul>
+      <p id="lista-vazia">Nenhum gasto registrado ainda.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>Feito com HTML, CSS e JavaScript puro — os dados ficam só no seu navegador.</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="js/app.js" defer></script>
+</body>
+</html>
