@@ -175,3 +175,30 @@ button.mini.remover {
 button.mini.remover:hover {
   background: #b52b27;
 }
+
+/* Responsividade — ajustes para telas pequenas */
+@media (max-width: 480px) {
+  header {
+    padding: 16px;
+  }
+
+  main {
+    margin: 16px auto;
+  }
+
+  .cards {
+    flex-direction: column;
+  }
+
+  #lista-gastos li {
+    flex-wrap: wrap;
+  }
+
+  .item-valor {
+    margin-left: auto;
+  }
+
+  button.mini {
+    padding: 6px 10px;
+  }
+}
