@@ -1,5 +1,7 @@
 // Controle de Gastos
-// Nesta versão: cadastro de gastos e lista na tela (ainda sem salvar no navegador).
+// Nesta versão: os gastos agora são salvos no navegador (localStorage).
+
+var CHAVE_STORAGE = 'gastos-controle';
 
 var gastos = [];
 
@@ -45,9 +47,29 @@ form.addEventListener('submit', function (evento) {
     categoria: categoria
   });
 
+  salvarGastos();
   renderizarLista();
   form.reset();
 });
+
+// Salva a lista no navegador
+function salvarGastos() {
+  localStorage.setItem(CHAVE_STORAGE, JSON.stringify(gastos));
+}
+
+// Carrega a lista salva quando a página abre
+function carregarGastos() {
+  var salvo = localStorage.getItem(CHAVE_STORAGE);
+
+  if (salvo !== null) {
+    try {
+      gastos = JSON.parse(salvo);
+    } catch (erro) {
+      // Se o conteúdo salvo estiver corrompido, começa com a lista vazia
+      gastos = [];
+    }
+  }
+}
 
 function renderizarLista() {
   listaGastos.innerHTML = '';
@@ -95,3 +117,7 @@ function formatarData(data) {
   var partes = data.split('-');
   return partes[2] + '/' + partes[1] + '/' + partes[0];
 }
+
+// Carrega o que já foi salvo e mostra na tela
+carregarGastos();
+renderizarLista();
