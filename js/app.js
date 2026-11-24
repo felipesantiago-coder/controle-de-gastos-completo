@@ -1,5 +1,5 @@
 // Controle de Gastos
-// Nesta versão: agora também é possível remover um gasto da lista.
+// Nesta versão: além de remover, dá para editar um gasto pelo mesmo formulário.
 
 var CHAVE_STORAGE = 'gastos-controle';
 
@@ -8,6 +8,17 @@ var gastos = [];
 var form = document.getElementById('form-gasto');
 var listaGastos = document.getElementById('lista-gastos');
 var listaVazia = document.getElementById('lista-vazia');
+
+// Campos guardados em variáveis para facilitar na edição
+var campoDescricao = document.getElementById('descricao');
+var campoValor = document.getElementById('valor');
+var campoData = document.getElementById('data');
+var campoCategoria = document.getElementById('categoria');
+var botaoForm = document.getElementById('botao-form');
+var botaoCancelar = document.getElementById('botao-cancelar');
+
+// Guarda o id do gasto que está sendo editado (null = é um gasto novo)
+var idEditando = null;
 
 var nomesCategorias = {
   alimentacao: 'Alimentação',
@@ -20,10 +31,10 @@ var nomesCategorias = {
 form.addEventListener('submit', function (evento) {
   evento.preventDefault();
 
-  var descricao = document.getElementById('descricao').value.trim();
-  var valor = parseFloat(document.getElementById('valor').value);
-  var data = document.getElementById('data').value;
-  var categoria = document.getElementById('categoria').value;
+  var descricao = campoDescricao.value.trim();
+  var valor = parseFloat(campoValor.value);
+  var data = campoData.value;
+  var categoria = campoCategoria.value;
 
   // Validações simples antes de aceitar o gasto
   if (descricao === '') {
@@ -39,18 +50,62 @@ form.addEventListener('submit', function (evento) {
     return;
   }
 
-  gastos.push({
-    id: Date.now(),
-    descricao: descricao,
-    valor: valor,
-    data: data,
-    categoria: categoria
-  });
+  if (idEditando !== null) {
+    // Está editando um gasto que já existe
+    var gasto = gastos.find(function (g) {
+      return g.id === idEditando;
+    });
+    if (gasto) {
+      gasto.descricao = descricao;
+      gasto.valor = valor;
+      gasto.data = data;
+      gasto.categoria = categoria;
+    }
+    cancelarEdicao();
+  } else {
+    // É um gasto novo
+    gastos.push({
+      id: Date.now(),
+      descricao: descricao,
+      valor: valor,
+      data: data,
+      categoria: categoria
+    });
+  }
 
   salvarGastos();
   renderizarLista();
-  form.reset();
 });
+
+// Preenche o formulário com o gasto escolhido
+function iniciarEdicao(id) {
+  var gasto = gastos.find(function (g) {
+    return g.id === id;
+  });
+  if (!gasto) {
+    return;
+  }
+
+  idEditando = id;
+  campoDescricao.value = gasto.descricao;
+  campoValor.value = gasto.valor;
+  campoData.value = gasto.data;
+  campoCategoria.value = gasto.categoria;
+
+  botaoForm.textContent = 'Salvar alterações';
+  botaoCancelar.classList.remove('oculto');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Devolve o formulário ao modo de gasto novo
+function cancelarEdicao() {
+  idEditando = null;
+  form.reset();
+  botaoForm.textContent = 'Adicionar gasto';
+  botaoCancelar.classList.add('oculto');
+}
+
+botaoCancelar.addEventListener('click', cancelarEdicao);
 
 // Salva a lista no navegador
 function salvarGastos() {
@@ -110,6 +165,13 @@ function renderizarLista() {
     valor.className = 'item-valor';
     valor.textContent = formatarValor(gasto.valor);
 
+    var botaoEditar = document.createElement('button');
+    botaoEditar.className = 'mini';
+    botaoEditar.textContent = 'Editar';
+    botaoEditar.addEventListener('click', function () {
+      iniciarEdicao(gasto.id);
+    });
+
     var botaoRemover = document.createElement('button');
     botaoRemover.className = 'mini remover';
     botaoRemover.textContent = 'Remover';
@@ -121,6 +183,7 @@ function renderizarLista() {
 
     item.appendChild(info);
     item.appendChild(valor);
+    item.appendChild(botaoEditar);
     item.appendChild(botaoRemover);
     listaGastos.appendChild(item);
   });
