@@ -160,3 +160,18 @@ footer {
   font-size: 12px;
   padding: 16px;
 }
+
+/* Botões pequenos da lista */
+button.mini {
+  margin-top: 0;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+button.mini.remover {
+  background: #d9534f;
+}
+
+button.mini.remover:hover {
+  background: #b52b27;
+}

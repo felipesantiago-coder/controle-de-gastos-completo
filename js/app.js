@@ -1,5 +1,5 @@
 // Controle de Gastos
-// Nesta versão: os gastos agora são salvos no navegador (localStorage).
+// Nesta versão: agora também é possível remover um gasto da lista.
 
 var CHAVE_STORAGE = 'gastos-controle';
 
@@ -71,6 +71,15 @@ function carregarGastos() {
   }
 }
 
+// Remove um gasto pelo id, depois de pedir confirmação
+function removerGasto(id) {
+  gastos = gastos.filter(function (g) {
+    return g.id !== id;
+  });
+  salvarGastos();
+  renderizarLista();
+}
+
 function renderizarLista() {
   listaGastos.innerHTML = '';
 
@@ -101,8 +110,18 @@ function renderizarLista() {
     valor.className = 'item-valor';
     valor.textContent = formatarValor(gasto.valor);
 
+    var botaoRemover = document.createElement('button');
+    botaoRemover.className = 'mini remover';
+    botaoRemover.textContent = 'Remover';
+    botaoRemover.addEventListener('click', function () {
+      if (confirm('Remover o gasto "' + gasto.descricao + '"?')) {
+        removerGasto(gasto.id);
+      }
+    });
+
     item.appendChild(info);
     item.appendChild(valor);
+    item.appendChild(botaoRemover);
     listaGastos.appendChild(item);
   });
 
