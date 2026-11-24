@@ -188,6 +188,59 @@ function atualizarResumo(filtrados) {
   document.getElementById('maior-categoria').textContent = maiorCategoria;
 }
 
+// Desenha o gráfico de rosca com o total de cada categoria
+var grafico = null;
+
+function atualizarGrafico(filtrados) {
+  // Se o Chart.js não carregou (sem internet, por exemplo), não faz nada
+  if (typeof Chart === 'undefined') {
+    return;
+  }
+
+  var totaisPorCategoria = {};
+  filtrados.forEach(function (g) {
+    totaisPorCategoria[g.categoria] = (totaisPorCategoria[g.categoria] || 0) + g.valor;
+  });
+
+  var rotulos = [];
+  var valores = [];
+  Object.keys(nomesCategorias).forEach(function (categoria) {
+    if (totaisPorCategoria[categoria]) {
+      rotulos.push(nomesCategorias[categoria]);
+      valores.push(totaisPorCategoria[categoria]);
+    }
+  });
+
+  // Sem dados, esconde o gráfico
+  var tela = document.getElementById('grafico-categorias');
+  tela.style.display = valores.length === 0 ? 'none' : 'block';
+
+  if (grafico !== null) {
+    grafico.destroy();
+    grafico = null;
+  }
+
+  if (valores.length === 0) {
+    return;
+  }
+
+  grafico = new Chart(tela, {
+    type: 'doughnut',
+    data: {
+      labels: rotulos,
+      datasets: [{
+        data: valores,
+        backgroundColor: ['#2c7be5', '#f6963c', '#41c6a2', '#e05a6d', '#9b7ede']
+      }]
+    },
+    options: {
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+}
+
 // Salva a lista no navegador
 function salvarGastos() {
   localStorage.setItem(CHAVE_STORAGE, JSON.stringify(gastos));
@@ -284,6 +337,7 @@ function renderizarLista() {
   }
 
   atualizarResumo(filtrados);
+  atualizarGrafico(filtrados);
 }
 
 function formatarValor(valor) {
