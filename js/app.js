@@ -157,6 +157,37 @@ function gastosFiltrados() {
   });
 }
 
+// Atualiza os cartões do resumo com base nos gastos filtrados
+function atualizarResumo(filtrados) {
+  var totalFiltrado = filtrados.reduce(function (soma, g) {
+    return soma + g.valor;
+  }, 0);
+
+  var totalGeral = gastos.reduce(function (soma, g) {
+    return soma + g.valor;
+  }, 0);
+
+  document.getElementById('total-filtrado').textContent = formatarValor(totalFiltrado);
+  document.getElementById('total-geral').textContent = formatarValor(totalGeral);
+
+  // Soma os valores por categoria para achar a maior
+  var totaisPorCategoria = {};
+  filtrados.forEach(function (g) {
+    totaisPorCategoria[g.categoria] = (totaisPorCategoria[g.categoria] || 0) + g.valor;
+  });
+
+  var maiorCategoria = '—';
+  var maiorValor = 0;
+  Object.keys(totaisPorCategoria).forEach(function (categoria) {
+    if (totaisPorCategoria[categoria] > maiorValor) {
+      maiorValor = totaisPorCategoria[categoria];
+      maiorCategoria = nomesCategorias[categoria];
+    }
+  });
+
+  document.getElementById('maior-categoria').textContent = maiorCategoria;
+}
+
 // Salva a lista no navegador
 function salvarGastos() {
   localStorage.setItem(CHAVE_STORAGE, JSON.stringify(gastos));
@@ -251,6 +282,8 @@ function renderizarLista() {
   } else {
     listaVazia.style.display = 'none';
   }
+
+  atualizarResumo(filtrados);
 }
 
 function formatarValor(valor) {
