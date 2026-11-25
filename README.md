@@ -40,6 +40,17 @@ Os gastos ficam salvos no navegador usado. Se você limpar os dados do navegador
 2. Em **Source**, escolha a branch `main` e a pasta `/ (root)`.
 3. Salve. Em alguns minutos a página fica disponível no endereço mostrado na tela.
 
+## Como publicar na Vercel
+
+Também funciona sem configuração (o arquivo `vercel.json` já está no repositório):
+
+1. Acesse [vercel.com/new](https://vercel.com/new) com uma conta gratuita.
+2. Clique em **Import Git Repository** e escolha este repositório.
+3. Clique em **Deploy** — não precisa preencher nada (é um site estático).
+4. Em instantes a página fica disponível no endereço `*.vercel.app` gerado.
+
+Depois de cada novo commit na `main`, a Vercel atualiza o site sozinha.
+
 ## Estrutura do projeto
 
 - `index.html` — a página
